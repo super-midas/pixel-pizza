@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>픽셀 피자가게</title>
+<style>
+:root{
+  --ink:#2a1c18; --cream:#f3e6c4; --tomato:#c8412d; --basil:#4c8a3d; --mustard:#e9b84a; --steel:#8d9aa2;
+  --page:#efe3c2; --check:rgba(200,65,45,.38);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --page:#2b1d19; --check:rgba(200,65,45,.28); }
+}
+:root[data-theme="dark"]{ --page:#2b1d19; --check:rgba(200,65,45,.28); }
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{
+  margin:0;min-height:100%;
+  background-color:var(--page);
+  background-image:linear-gradient(90deg,var(--check) 50%,transparent 50%),linear-gradient(var(--check) 50%,transparent 50%);
+  background-size:36px 36px;
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  color:var(--cream);
+  -webkit-user-select:none;user-select:none;
+}
+#app{max-width:920px;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px;min-height:100dvh;}
+#hud{display:flex;gap:8px;flex-wrap:wrap;align-items:stretch;}
+.pill{background:var(--ink);border:3px solid #000;box-shadow:0 3px 0 #000;padding:6px 10px;display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;line-height:1.2;}
+.coin{width:14px;height:14px;background:var(--mustard);box-shadow:inset -3px -3px 0 #b88a24,inset 2px 2px 0 #fff0a0;display:inline-block;}
+#money{font-variant-numeric:tabular-nums;min-width:2ch;text-align:right;}
+.timebar{width:84px;height:10px;background:#5c4a3d;border:2px solid #000;}
+.timebar span{display:block;height:100%;width:0;background:var(--mustard);}
+#stage{position:relative;width:min(100%,calc((100dvh - 250px) * 4 / 3),880px);min-width:280px;aspect-ratio:4/3;margin:4px auto;background:#222;box-shadow:0 0 0 4px var(--ink),0 6px 0 4px #000;container-type:inline-size;}
+#c{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated;touch-action:none;}
+#labels{position:absolute;inset:0;pointer-events:none;}
+.lab{display:none;position:absolute;transform:translateX(-50%);font-size:2.5cqw;line-height:1.25;padding:.15em .5em;background:rgba(42,28,24,.86);color:var(--cream);font-weight:800;white-space:nowrap;}
+#labels.show-main .lab.main{display:block;}
+#labels.show-prep .lab.prep{display:block;}
+#hint{background:var(--ink);border:3px solid #000;padding:8px 12px;font-size:15px;font-weight:700;line-height:1.4;min-height:44px;display:flex;align-items:center;}
+#bar{display:flex;gap:8px;flex-wrap:wrap;}
+button{font:inherit;font-weight:800;font-size:15px;color:var(--ink);background:var(--mustard);border:3px solid #000;box-shadow:0 4px 0 #000;padding:9px 14px;cursor:pointer;touch-action:manipulation;}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #000;}
+button:focus-visible{outline:3px solid var(--cream);outline-offset:2px;}
+button:disabled{background:#8d8068;color:#4b4132;cursor:not-allowed;}
+button.go{background:var(--basil);color:#fff;}
+button.alt{background:var(--cream);}
+[hidden]{display:none !important;}
+#modal{position:fixed;inset:0;background:rgba(20,10,6,.72);display:flex;align-items:center;justify-content:center;padding:14px;z-index:10;}
+#panel{width:min(520px,100%);max-height:86dvh;overflow:auto;background:var(--ink);border:4px solid #000;box-shadow:0 6px 0 #000;padding:16px;}
+#panel h2{margin:0 0 10px;font-size:20px;}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-top:2px dashed #5c4a3d;align-items:center;}
+.row:first-of-type{border-top:0;}
+.row b{font-size:16px;}
+.row small{grid-column:1;color:#d8c9a0;font-size:13px;line-height:1.4;}
+.row button{grid-row:1 / span 2;grid-column:2;min-width:96px;}
+.sum{display:grid;grid-template-columns:1fr auto;gap:6px 12px;font-size:16px;margin:8px 0 14px;}
+.sum span:nth-child(even){text-align:right;font-weight:800;font-variant-numeric:tabular-nums;}
+.note{color:#ffb4a4;font-weight:700;margin:0 0 12px;}
+.xbtn{position:sticky;top:0;float:right;min-width:0;padding:2px 11px;margin:-6px -6px 0 8px;font-size:18px;line-height:1.2;background:var(--tomato);color:#fff;z-index:2;}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hud">
+    <div class="pill"><i class="coin"></i><span id="money">0</span>원</div>
+    <div class="pill"><span id="dayLabel">1일차</span><div class="timebar"><span id="timefill"></span></div></div>
+    <div class="pill" id="stat">반죽 0 / 직원 0</div>
+  </div>
+  <div id="stage">
+    <canvas id="c" width="320" height="240" aria-label="피자가게 게임 화면"></canvas>
+    <div id="labels"></div>
+  </div>
+  <div id="hint"></div>
+  <div id="bar">
+    <button id="btnBack" class="alt" hidden>돌아가기</button>
+    <button id="btnDone" class="go" hidden>피자 완성</button>
+    <button id="btnShop">가게 관리</button>
+    <button id="btnDecor">상점</button>
+    <button id="btnSave">저장 목록</button>
+    <button id="btnSnd" class="alt">효과음 끄기</button>
+    <button id="btnBgm" class="alt">배경음 끄기</button>
+  </div>
+</div>
+<div id="modal" hidden><div id="panel" role="dialog" aria-modal="true"></div></div>
+
+<script src="g1.js"></script>
+<script src="g2.js"></script>
+<script src="g3.js"></script>
+<script src="g4.js"></script>
+
+</body>
+</html>
