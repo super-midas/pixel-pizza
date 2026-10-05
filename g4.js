@@ -1,6 +1,6 @@
 'use strict';
 function shopItems(){return[
-{id:'oven',name:'화로 화력',desc:'구우는 시간 '+ovenTime().toFixed(1)+'초',lv:S.up.oven,max:4,cost:COST.oven[S.up.oven]},
+{id:'oven',name:'화로 화력',desc:'굽는 시간 '+ovenTime().toFixed(1)+'초',lv:S.up.oven,max:4,cost:COST.oven[S.up.oven]},
 {id:'slots',name:'화로 칸 늘리기',desc:'한 번에 '+slotsCount()+'판 구울 수 있어요',lv:S.up.slots,max:2,cost:COST.slots[S.up.slots]},
 {id:'roll',name:'밀대',desc:'반죽 펴는 속도 x'+rollMult().toFixed(1),lv:S.up.roll,max:3,cost:COST.roll[S.up.roll]},
 {id:'spoon',name:'큰 국자',desc:'소스와 치즈를 바르는 범위 '+brushR()+'칸',lv:S.up.spoon,max:3,cost:COST.spoon[S.up.spoon]},
@@ -17,7 +17,7 @@ const THEMES=[
 const DECOR=[
 {id:'tree',name:'큰 나무 화분',desc:'가게 왼쪽에 커다란 나무가 자라요',cost:150},
 {id:'vines',name:'덩굴 장식',desc:'벽에 초록 덩굴이 늘어져요',cost:80},
-{id:'fireflies',name:'반딩불 조명',desc:'깜빡이는 반딩불이 가게를 날아다녀요',cost:120},
+{id:'fireflies',name:'반딧불 조명',desc:'깜빡이는 반딧불이 가게를 날아다녀요',cost:120},
 {id:'moss',name:'이끼 카펫',desc:'바닥 가운데에 폭신한 이끼 카펫을 깔아요',cost:100},
 {id:'mush',name:'버섯 의자',desc:'손님 자리에 빨간 버섯 의자를 놓아요',cost:90},
 {id:'plants',name:'화분 세트',desc:'카운터 위에 작은 화분을 올려요',cost:60},
@@ -64,7 +64,7 @@ if(!drag&&box.state==='closed'&&Math.abs(m.x-BOXP[0])<=12&&Math.abs(m.y-BOXP[1])
 if(!drag)station=hitStation(m)||'floor';
 }else if(S.mode==='prep'){
 const q=pp(m);P.lx=q.x;P.ly=q.y;tool=null;roll=false;const b=hitBowl(q);
-if(b){if(prep.p>=1){tool=b.k;beep(440,.04,'square',.04);}else msg('먼저 반죽을 동그랅게 펴세요');}
+if(b){if(prep.p>=1){tool=b.k;beep(440,.04,'square',.04);}else msg('먼저 반죽을 동그랗게 펴세요');}
 else if(q.x<156&&prep.p<1)roll=true;
 }
 });
@@ -113,7 +113,7 @@ function leavePrep(){S.mode='zoomOut';S.zoomT=1;$('labels').className='';$('btnB
 $('btnBack').addEventListener('click',()=>{if(S.mode==='prep')leavePrep();});
 $('btnDone').addEventListener('click',()=>{if(S.mode!=='prep'||S.paused)return;
 if(S.raw){msg('반죽대 위의 피자를 먼저 화로에 넣으세요');return;}
-if(prep.p<1){msg('먼저 반죽을 동그랅게 펴세요');return;}
+if(prep.p<1){msg('먼저 반죽을 동그랗게 펴세요');return;}
 if(!prep.sOK){msg('소스를 더 발라주세요');return;}
 if(!prep.cOK){msg('치즈를 더 뿌려주세요');return;}
 S.raw={cheese:Math.min(1,prep.cc/tot*1.5),tops:prep.tops.slice(),seed:(Math.random()*1000)|0};resetPrep();beep(660,.1,'triangle',.06);beep(880,.14,'triangle',.06,.1);
